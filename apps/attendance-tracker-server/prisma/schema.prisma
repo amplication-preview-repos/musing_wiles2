@@ -1,0 +1,52 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model AttendanceRecord {
+  checkInTime      DateTime?
+  checkOutTime     DateTime?
+  createdAt        DateTime  @default(now())
+  id               String    @id @default(cuid())
+  location         Location? @relation(fields: [locationId], references: [id])
+  locationId       String?
+  qrCode           String?
+  qrCodeExpiration DateTime?
+  shift            Shift?    @relation(fields: [shiftId], references: [id])
+  shiftId          String?
+  updatedAt        DateTime  @updatedAt
+  worker           Worker?   @relation(fields: [workerId], references: [id])
+  workerId         String?
+}
+
+model Worker {
+  attendanceRecords AttendanceRecord[]
+  createdAt         DateTime           @default(now())
+  id                String             @id @default(cuid())
+  name              String?
+  role              String?
+  updatedAt         DateTime           @updatedAt
+}
+
+model Shift {
+  attendanceRecords AttendanceRecord[]
+  createdAt         DateTime           @default(now())
+  endTime           DateTime?
+  id                String             @id @default(cuid())
+  name              String?
+  startTime         DateTime?
+  updatedAt         DateTime           @updatedAt
+}
+
+model Location {
+  address           String?
+  attendanceRecords AttendanceRecord[]
+  createdAt         DateTime           @default(now())
+  id                String             @id @default(cuid())
+  name              String?
+  updatedAt         DateTime           @updatedAt
+}
